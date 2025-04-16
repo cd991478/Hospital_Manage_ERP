@@ -882,7 +882,7 @@ private async void setting_Click(object sender, EventArgs e)
         await all_data_Load();
     }
 }
-private async Task all_data_Load()
+private async Task all_data_Load()    // 데이터 리스트를 비우고, 새로 모두 불러옴
 {
     patient_list.Columns.Clear();
     appointment_list.Columns.Clear();
