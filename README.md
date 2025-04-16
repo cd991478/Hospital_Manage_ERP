@@ -173,7 +173,8 @@ private void LoadData(string query, DataGridView dataGrid, Action<DataTable> cus
     }
 }
 ```
-- 로그인 성공시 메인폼이 실행되며, 전체 DB를 불러옵니다.
+- DB에 접속 성공시 메인폼이 실행되며 전체 DB를 불러옵니다.
+- 강제 실행을 할 경우 메인폼은 실행되지만 로그인 정보가 없기 때문에 DB는 불러오지 않습니다.
 
 #### 3. 환자 정보 데이터 수정 기능
 ![4](./images/4.png)
