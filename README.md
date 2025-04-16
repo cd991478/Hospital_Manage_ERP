@@ -37,45 +37,55 @@ public partial class login_form : Form
         id = login_id_value.Text;
         pw = login_pw_value.Text;
         bool tf = false;    // 로그인 결과를 저장할 변수
-        connectionString = $"Server={server};Database={database};Uid={id};Pwd={pw};";
-        conn = new MySqlConnection(connectionString);
-        try
+    
+        if (unlogin_box.Checked)    // 강제 실행 체크된경우
         {
-            conn.Open();
-            MessageBox.Show("접속에 성공 하였습니다.");
+            server = "unlogined";
+            database = "unlogined";
+            id = "unlogined";
+            pw = "";
             tf = true;
-
         }
-        catch (Exception ex)
+        else
         {
-            MessageBox.Show("접속에 실패 하였습니다.\n" + ex.Message);
-            
+            connectionString = $"Server={server};Database={database};Uid={id};Pwd={pw};";
+            conn = new MySqlConnection(connectionString);
+            try
+            {
+                conn.Open();
+                MessageBox.Show("접속에 성공 하였습니다.");
+                tf = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("접속에 실패 하였습니다.\n" + ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
         }
-        finally
+    
+        if (tf == true)     // 로그인 성공시 혹은 강제 실행 한 경우
         {
-            conn.Close();
-        }
-
-        if (tf == true)     // 로그인 성공시
-        {
-            main_form main_form = new main_form(server, database, id, pw);
+            main_form main_form = new main_form(this, server, database, id, pw);
             this.Hide();    // 닫으면 프로그램이 종료되므로 숨겨야함
             main_form.Show();
-            main_form.FormClosed += (s, args) => this.Close();      // 프로그램 종료시 Hide 된 로그인 폼 프로세스가 유지되는 현상을 막기위해 추가
         }
-    }
+}
 ```
 
 - 프로그램 실행시 먼저 로그인 폼이 실행되며, MySQL DB 로그인 정보를 입력하여 DB 서버 접속 및 프로그램 실행이 가능합니다.
-
+- 강제 실행을 체크하고 로그인 버튼을 누르면 DB 연결 없이 메인 화면으로 진입 할 수 있습니다.
 
 #### 2. 데이터 로드
 ![2](./images/2.png)
 ![3](./images/3.png)
 ```c#
-public main_form(string login_server, string login_database, string login_id, string login_pw)
+public main_form(Form login_form, string login_server, string login_database, string login_id, string login_pw)
 {
     InitializeComponent();
+    loginform = login_form;
     server = login_server; // 로그인 폼에서 입력한 값을 전달 받음
     database = login_database;
     id = login_id;
@@ -87,9 +97,12 @@ public main_form(string login_server, string login_database, string login_id, st
 
 private async void main_form_Load(object sender, EventArgs e) // 비동기를 사용하지 않으면 progressform이 정상 작동하지 않고 멈추므로 비동기 작업 사용
 {
-    progressform.Show();
-    await LoadDataAsync(); // 전체 데이터를 비동기로 로드
-    progressform.Close();
+    if (server != "unlogined" && database != "unlogined" && id != "unlogined" && pw != "")   // 강제 접속 하지않고 정상 로그인 한경우
+    {
+        progressform.Show();
+        await LoadDataAsync(); // 전체 데이터를 비동기로 로드
+        progressform.Close();
+    }
 }
 
 private async Task LoadDataAsync()
@@ -945,7 +958,32 @@ public partial class setting_form : Form
         }
     }
 }
+
+
 ```
 
 - 환경 설정 버튼을 누르면 새 창이 띄워지며, 현재 접속중인 DB의 정보를 불러옵니다.
 - 다른 DB에 접속하길 원하는 경우, 값을 수정하여 적용 버튼을 누르면 해당 DB에 연결하여 새로운 데이터를 불러옵니다.
+
+#### 11. 프로그램 종료
+![17](./images/17.png)
+```c#
+private void main_form_FormClosing(object sender, FormClosingEventArgs e)
+{
+    DialogResult result = MessageBox.Show("정말 종료하시겠습니까?", "프로그램 종료", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+    if (result == DialogResult.No)
+    {
+        e.Cancel = true;
+        return;
+    }
+    if (conn != null && conn.State == ConnectionState.Open) // DB 연결이 남아있는경우 연결 해제
+    {
+        conn.Close();
+    }
+    loginform.Close();      // Hide된 로그인 폼 제거
+    Environment.Exit(0);    // 프로그램 종료
+}
+```
+
+- 메인 화면에서 우측 상단 X 버튼을 누르면 확인창이 뜨며, 확인 버튼을 누르면 프로그램이 정상 종료 됩니다.
+
