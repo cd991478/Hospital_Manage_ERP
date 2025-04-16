@@ -708,7 +708,6 @@ public partial class hospital_create_form : Form
     {
         InitializeComponent();
         conn = new MySqlConnection($"Server={server};Database={db};Uid={id};Pwd={pw}");
-        this.Load += new EventHandler(hospital_create_form_Load);
         this.server = server;
         this.db = db;
         this.id = id;
