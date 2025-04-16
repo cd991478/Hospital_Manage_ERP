@@ -61,7 +61,7 @@ public partial class login_form : Form
             main_form main_form = new main_form(server, database, id, pw);
             this.Hide();    // 닫으면 프로그램이 종료되므로 숨겨야함
             main_form.Show();
-            main_form.FormClosed += (s, args) => this.Close();      // 프로그램 종료시 로그인 폼 프로세스가 유지되는 현상을 막기위해 추가
+            main_form.FormClosed += (s, args) => this.Close();      // 프로그램 종료시 Hide 된 로그인 폼 프로세스가 유지되는 현상을 막기위해 추가
         }
     }
 ```
@@ -944,7 +944,3 @@ public partial class setting_form : Form
 
 - 환경 설정 버튼을 누르면 새 창이 띄워지며, 현재 접속중인 DB의 정보를 불러옵니다.
 - 다른 DB에 접속하길 원하는 경우, 값을 수정하여 적용 버튼을 누르면 해당 DB에 연결하여 새로운 데이터를 불러옵니다.
-
-#### 11. 프로그램 종료 및 자원 정리
-![17](./images/17.png)
-```c#
