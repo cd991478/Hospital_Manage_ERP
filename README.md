@@ -877,7 +877,8 @@ private async void setting_Click(object sender, EventArgs e)
         database = settingsForm.Database;
         id = settingsForm.Id;
         pw = settingsForm.Pw;
-        conn.ConnectionString = $"Server={server};Database={database};Uid={id};Pwd={pw};";
+        connectionString = $"Server={server};Database={database};Uid={id};Pwd={pw};";
+        conn.ConnectionString = connectionString;
         await all_data_Load();
     }
 }
