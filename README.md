@@ -96,7 +96,7 @@ private async Task LoadDataAsync()
 {
     await Task.Run(() =>
     {
-        LoadPatientInfo();  // 각 DB 정보를 불러오는 함수
+        LoadPatientInfo();  // 각 DB 정보를 불러오는 메서드
         LoadAppointmentInfo();
         LoadHospitalList();
         LoadUserInfo();
@@ -383,13 +383,18 @@ public partial class patient_edit_form : Form
             else
             {
                 MessageBox.Show("0에서 10 사이의 값을 입력해주세요.");
+                p_vas_range.Value = 0;  // 잘못된 값 입력 시 저장되는것을 방지하기 위해 0으로 강제 초기화
+                p_vas_value.Text = "0";
             }
         }
         else
         {
             MessageBox.Show("숫자를 입력해주세요.");
+            p_vas_range.Value = 0;
+            p_vas_value.Text = "0";
         }
     }
+}
 ```
 
 - 데이터를 선택하고 수정 버튼을 누르면 새 창에서 해당 환자의 데이터를 불러오며, 환자 primary key인 id와 등록 회원 id를 제외한 데이터 수정이 가능합니다.
