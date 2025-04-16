@@ -554,8 +554,397 @@ private void patient_search_Click(object sender, EventArgs e)
 - 검색 버튼을 누르면 새 창이 열리며, 데이터에서 찾기 원하는 문구를 입력 후 검색 버튼을 누르면 해당 문구가 포함된 모든 데이터가 출력됩니다.
 - 두 개의 TextBox중 하나의 값만 입력해도 작동합니다.
 
-#### 7. 예약 정보 조회 및 수정 (테이블 Join)
+#### 7. 예약 정보 수정 (테이블 Join)
 ![10](./images/10.png)
 ```c#
+public partial class appointment_edit_form : Form
+{
+    private MySqlConnection conn;
+    private int appointmentId;
+    private string server;
+    private string database;
+    private string id;
+    private string pw;
 
+    public appointment_edit_form(int appointmentId, string server, string database, string id, string pw)
+    {
+        InitializeComponent();
+        this.appointmentId = appointmentId;
+        this.server = server;
+        this.database = database;
+        this.id = id;
+        this.pw = pw;
+        conn = new MySqlConnection($"Server={server};Database={database};Uid={id};Pwd={pw}");
+    }
+    private void appointment_edit_form_Load(object sender, EventArgs e)
+    {
+        LoadAppointmentInfo();
+    }
+
+    private void LoadAppointmentInfo()
+    {
+        try
+        {
+            conn.Open();
+            string query = "SELECT a.id, a.appointment_time, a.created_time, " +
+           "a.patient_name, a.h_id, a.user_id, " +
+           "h.h_name AS hospital_name, h.h_department, h.h_categorie, h.h_phone_number, h.h_region, h.h_address, " +
+           "u.user_name, u.user_reg_num, u.user_gender, u.user_phone, u.user_address1, u.user_address2 " +
+           "FROM appointment a " +
+           "JOIN d_hospital_v1 h ON a.h_id = h.h_id " +
+           "JOIN user u ON a.user_id = u.user_id " +
+           "WHERE a.id = @id";
+
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@id", appointmentId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+
+            if (reader.Read())  // 예약자 정보, 병원 정보, 예약 시간 정보 표시
+            {
+                appointment_id_value.Text = reader["id"].ToString();
+                patient_name_value.Text = reader["patient_name"].ToString();
+                h_id_value.Text = reader["h_id"].ToString();
+                user_id_value.Text = reader["user_id"].ToString();
+                created_time_value.Text = reader["created_time"].ToString();
+                hospital_name_value.Text = reader["hospital_name"].ToString();
+
+                // 날짜 변환
+                string appointmentTimeString = reader["appointment_time"].ToString();
+                DateTime appointmentTime = DateTime.Parse(appointmentTimeString);
+                appointment_year_value.Text = appointmentTime.Year.ToString();
+                appointment_month_value.Text = appointmentTime.Month.ToString("D2");  // 2자리 단위로 끊어서 표시
+                appointment_day_value.Text = appointmentTime.Day.ToString("D2");
+                appointment_hour_value.Text = appointmentTime.Hour.ToString("D2");
+                appointment_minute_value.Text = appointmentTime.Minute.ToString("D2");
+
+                int gender = Convert.ToInt32(reader["user_gender"]);
+                if(gender == 0) {user_gender_value.Text = "남성";}
+                else            {user_gender_value.Text = "여성";}
+
+                user_name_value.Text = reader["user_name"].ToString();
+                user_regnum_value.Text = reader["user_reg_num"].ToString();
+                user_address1_value.Text = reader["user_address1"].ToString();
+                user_address2_value.Text = reader["user_address2"].ToString();
+                user_phone_value.Text = reader["user_phone"].ToString();
+               
+                hospital_department_value.Text = reader["h_department"].ToString();
+                hospital_categorie_value.Text = reader["h_categorie"].ToString();
+                hospital_phone_value.Text = reader["h_phone_number"].ToString();
+                hospital_region_value.Text = reader["h_region"].ToString();
+                hospital_address1_value.Text = reader["h_address"].ToString();
+            }
+            reader.Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("오류: " + ex.Message);
+        }
+        finally
+        {
+            conn.Close();
+        }
+    }
+
+
+    private void appointment_edit_save_button_Click(object sender, EventArgs e)
+    {
+        try
+        {   // 예약 정보 수정
+            conn.Open();
+            int year = Convert.ToInt32(appointment_year_value.Text);
+            int month = Convert.ToInt32(appointment_month_value.Text);
+            int day = Convert.ToInt32(appointment_day_value.Text);
+            int hour = Convert.ToInt32(appointment_hour_value.Text);
+            int minute = Convert.ToInt32(appointment_minute_value.Text);
+
+            DateTime appointmentTime = new DateTime(year, month, day, hour, minute, 0);
+            string appointmentTimeString = appointmentTime.ToString("yyyy-MM-dd HH:mm:ss"); // MySQL 형식 날짜로 변환
+
+            string query = "UPDATE appointment SET patient_name = @patient_name, appointment_time = @appointment_time WHERE id = @id";
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            cmd.Parameters.AddWithValue("@id", Convert.ToInt32(appointment_id_value.Text));
+            cmd.Parameters.AddWithValue("@patient_name", patient_name_value.Text);
+            cmd.Parameters.AddWithValue("@appointment_time", appointmentTimeString);
+            cmd.ExecuteNonQuery();
+
+            MessageBox.Show("예약 정보가 수정되었습니다.");
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("오류: " + ex.Message);
+        }
+        finally
+        {
+            conn.Close();
+        }
+    }
+}
 ```
+
+- 예약 정보 목록을 선택 후 수정 버튼을 누르면 해당 예약과 연결된 환자 id와 병원 id의 데이터를 Join 하여 불러옵니다.
+- 예약 시간을 변경하고 수정 버튼을 누르면 예약 시간 정보가 변경됩니다.
+
+
+#### 8. 병원 정보 등록
+![12](./images/12.png)
+```c#
+public partial class hospital_create_form : Form
+{
+    private string server;
+    private string db;
+    private string id;
+    private string pw;
+    private MySqlConnection conn;
+
+    public hospital_create_form(string server, string db, string id, string pw)
+    {
+        InitializeComponent();
+        conn = new MySqlConnection($"Server={server};Database={db};Uid={id};Pwd={pw}");
+        this.Load += new EventHandler(hospital_create_form_Load);
+        this.server = server;
+        this.db = db;
+        this.id = id;
+        this.pw = pw;
+    }
+
+    private void hospital_create_form_Load(object sender, EventArgs e)
+    {
+        LoadHospitalNumber();
+    }
+
+    private void LoadHospitalNumber()   // h_id (primary key) 값 설정을 위한 메서드
+    {
+        try
+        {
+            conn.Open();
+            string query = "SELECT MAX(h_id) FROM d_hospital_v1"; // 가장 마지막 (높은) pk값을 불러옴
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            if (reader.Read() && reader[0] != DBNull.Value) // DB가 있을경우
+            {
+                h_id_value.Text = (Convert.ToInt32(reader[0]) + 1).ToString();  // 불러온 가장 마지막 pk값에 1을 더하여 pk값 지정
+            }
+            else    // DB가 비어있을경우
+            {
+                h_id_value.Text = "1"; // 첫번째 데이터 이므로 1로 지정
+            }
+            reader.Close();
+        }
+        catch(Exception ex)
+        {
+            MessageBox.Show("오류: " + ex.Message);
+        }
+        finally
+        {
+            conn.Close();
+        }
+    }
+    private void hospital_create_button_Click(object sender, EventArgs e)
+    {
+        try
+        {
+            conn.Open();
+            string query = "INSERT INTO d_hospital_v1 (h_id, h_name, h_region, h_address, h_department, h_categorie, " +
+                               "h_phone_number, bed_total, bed_general, bed_nursing, bed_intensive, bed_isolation, bed_psy, bed_clean, " +
+                               "h_latitude, h_longitude) VALUES (@h_id, @h_name, @h_region, @h_address, @h_department, @h_categorie, " +
+                               "@h_phone_number, @bed_total, @bed_general, @bed_nursing, @bed_intensive, @bed_isolation, @bed_psy, @bed_clean, " +
+                               "@h_latitude, @h_longitude)";
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@h_id", h_id_value.Text);  // 상단에서 지정된 pk 값으로 설정하며 이는 사용자가 임의로 수정할 수 없음
+            cmd.Parameters.AddWithValue("@h_name", h_name_value.Text);  // 각종 병원 정보 삽입
+            cmd.Parameters.AddWithValue("@h_region", h_region_value.Text);
+            cmd.Parameters.AddWithValue("@h_address", h_address_value.Text);
+            cmd.Parameters.AddWithValue("@h_department", h_department_value.Text);
+            cmd.Parameters.AddWithValue("@h_categorie", h_categorie_value.Text);
+            cmd.Parameters.AddWithValue("@h_phone_number", h_phone_number_value.Text);
+            cmd.Parameters.AddWithValue("@bed_total", Convert.ToInt32(bed_total_value.Text));
+            cmd.Parameters.AddWithValue("@bed_general", Convert.ToInt32(bed_general_value.Text));
+            cmd.Parameters.AddWithValue("@bed_nursing", Convert.ToInt32(bed_nursing_value.Text));
+            cmd.Parameters.AddWithValue("@bed_intensive", Convert.ToInt32(bed_intensive_value.Text));
+            cmd.Parameters.AddWithValue("@bed_isolation", Convert.ToInt32(bed_isolation_value.Text));
+            cmd.Parameters.AddWithValue("@bed_psy", Convert.ToInt32(bed_psy_value.Text));
+            cmd.Parameters.AddWithValue("@bed_clean", Convert.ToInt32(bed_clean_value.Text));
+            cmd.Parameters.AddWithValue("@h_latitude", 36.12345678);    // 위도 경도는 별도의 주소 변환 과정이 필요해 예시 값으로 설정
+            cmd.Parameters.AddWithValue("@h_longitude", 128.12345678);
+            cmd.ExecuteNonQuery();
+            MessageBox.Show("병원 정보가 추가되었습니다.");
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("오류: " + ex.Message);
+        }
+        finally
+        {
+            conn.Close();
+        }
+    }
+```
+
+- 병원 정보 탭에서 병원 정보 등록을 누르면 새 창이 뜨며, 병원 정보를 기입 후 버튼을 누르면 새로운 병원 정보가 DB에 저장됩니다.
+- 병원 정보 테이블의 primary key 인 h_id를 생성 하기 위해 가장 마지막 h_id값을 찾고 1을 더하여 새로운 병원 정보의 primary key를 설정합니다.
+
+
+#### 9. 회원 정보 강제 삭제 (회원과 연결된 예약 포함)
+![15](./images/15.png)
+```c#
+private void user_delete_Click(object sender, EventArgs e)
+{
+    if (user_list.SelectedRows.Count > 0)   // 데이터를 선택하고 삭제 버튼을 눌렀는데
+    {
+        List<string> selectedUserId = new List<string>();
+        if (user_list.SelectedRows.Count == 1)  // 데이터가 1개인경우
+        {
+            var result = MessageBox.Show("해당 회원 정보 및 관련된 모든 예약 정보가 삭제됩니다.\n계속하시겠습니까?", "회원 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.No) { return; }
+            selectedUserId.Add(Convert.ToString(user_list.SelectedRows[0].Cells["아이디"].Value));
+        }
+        else    // 데이터가 여러개인경우
+        {
+            var result = MessageBox.Show($"{user_list.SelectedRows.Count}명의 회원 정보 및 관련된 모든 예약 정보가 삭제됩니다.\n계속하시겠습니까?", "회원 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            if (result == DialogResult.No) { return; }
+            for (int i = 0; i < user_list.SelectedRows.Count; i++)  // 리스트에 여러개의 아이디를 담음
+            {
+                selectedUserId.Add(Convert.ToString(user_list.SelectedRows[i].Cells["아이디"].Value));
+            }
+        }
+        for (int i = 0; i < selectedUserId.Count; i++) {
+            if (selectedUserId[i] == "admin")   // 관리자 계정이 선택 된 경우 작업 강제 중단
+            {
+                MessageBox.Show("관리자 계정은 삭제 할 수 없습니다.");
+                return;
+            }
+        }
+        try
+        {
+            conn.Open();
+            for (int i = 0; i < selectedUserId.Count; i++)
+            {
+                string query1 = "DELETE FROM appointment WHERE user_id = @user_id"; // 회원과 예약은 참조 관계이기 때문에 예약을 먼저 삭제하지 않으면 회원 삭제가 불가능
+                MySqlCommand cmd1 = new MySqlCommand(query1, conn);
+                cmd1.Parameters.AddWithValue("@user_id", selectedUserId[i]);
+                cmd1.ExecuteNonQuery();
+            }
+            for (int i = 0; i < selectedUserId.Count; i++)
+            {
+                string query2 = "DELETE FROM user WHERE user_id = @user_id";    // 회원 삭제
+                MySqlCommand cmd2 = new MySqlCommand(query2, conn);
+                cmd2.Parameters.AddWithValue("@user_id", selectedUserId[i]);
+                cmd2.ExecuteNonQuery();
+            }
+            MessageBox.Show("회원 정보 및 예약 정보가 삭제되었습니다.");
+            conn.Close();
+            LoadAppointmentInfo();
+            LoadUserInfo();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show("오류: " + ex.Message);
+        }
+        finally
+        {
+            conn.Close();
+        }
+    }
+    else
+    {
+        MessageBox.Show("삭제할 데이터를 선택해주세요.");
+    }
+}
+```
+
+- 회원 정보 탭에서 회원을 선택하고 삭제 버튼을 누르면 확인 경고 창이 뜨고, 확인 버튼을 누르면 선택된 회원과 연결된 예약 데이터를 모두 삭제하고, 회원 데이터를 삭제합니다.
+- 관리자 계정이 선택된 경우 알림을 띄우며 작업을 중단합니다.
+
+#### 10. DB 연결 설정 변경
+![16](./images/16.png)
+```c#
+
+private async void setting_Click(object sender, EventArgs e)
+{
+    setting_form settingsForm = new setting_form(server, database, id, pw); // 환경 설정 창 생성하며 현재 DB접속 정보 전달
+    if (settingsForm.ShowDialog() == DialogResult.OK)   // DB접속 정보가 변경된 경우
+    {
+        server = settingsForm.Server;   // 변경된 값 저장
+        database = settingsForm.Database;
+        id = settingsForm.Id;
+        pw = settingsForm.Pw;
+        conn.ConnectionString = $"Server={server};Database={database};Uid={id};Pwd={pw};";
+        await all_data_Load();
+    }
+}
+private async Task all_data_Load()
+{
+    patient_list.Columns.Clear();
+    appointment_list.Columns.Clear();
+    hospital_list.Columns.Clear();
+    user_list.Columns.Clear();
+    progressform = new ProgressForm();
+    progressform.Show();
+    await LoadDataAsync();
+    progressform.Close();
+}
+```
+```c#
+public partial class setting_form : Form
+{
+    public string Server { get; private set; }
+    public string Database { get; private set; }
+    public string Id { get; private set; }
+    public string Pw { get; private set; }
+    private MySqlConnection conn;
+
+    public setting_form(string server, string database, string id, string pw)
+    {
+        InitializeComponent();
+        this.Server = server;   // 현재 연결된 DB 정보를 설정
+        this.Database = database;
+        this.Id = id;
+        this.Pw = pw;
+    }
+
+    private void setting_Form_Load(object sender, EventArgs e)
+    {
+        server_value.Text = this.Server;    // 현재 값을 출력
+        db_value.Text = this.Database;
+        id_value.Text = this.Id;
+        pw_value.Text = this.Pw;
+    }
+    private void setting_Save_Click(object sender, EventArgs e)
+    {
+        this.Server = server_value.Text;    // 입력 된 값을 가져와 저장
+        this.Database = db_value.Text;
+        this.Id = id_value.Text;
+        this.Pw = pw_value.Text;
+
+        string connString = $"Server={this.Server};Database={this.Database};Uid={this.Id};Pwd={this.Pw}";   // 입력된 값으로 연결 시도하여 유효한지 체크
+        try
+        {
+            conn = new MySqlConnection(connString);
+            conn.Open();
+            MessageBox.Show("DB서버 연결에 성공했습니다.");
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"DB서버 연결 실패: {ex.Message}");
+        }
+        finally
+        {
+            conn.Close();
+        }
+    }
+}
+```
+
+- 환경 설정 버튼을 누르면 새 창이 띄워지며, 현재 접속중인 DB의 정보를 불러옵니다.
+- 다른 DB에 접속하길 원하는 경우, 값을 수정하여 적용 버튼을 누르면 해당 DB에 연결하여 새로운 데이터를 불러옵니다.
+
+#### 11. 프로그램 종료 및 자원 정리
+![17](./images/17.png)
+```c#
