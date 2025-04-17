@@ -418,58 +418,56 @@ public partial class patient_edit_form : Form
 #### 5. 환자 정보 데이터 삭제 기능
 ![5](./images/5.png)
 ```c#
-private void patientdelete_Click(object sender, EventArgs e)
-{
-    bool result = DeleteData(patient_list, "환자번호", "patient", "p_id"); // DataGridView, 한글명, 테이블명, id명
-    if (result == true) { LoadPatientInfo(); }  // 정상 삭제한 경우 데이터 갱신
-}
-        private bool DeleteData(DataGridView dataGridView, string tableNameKor, string tableName, string idStyle)
-{
-    if (dataGridView.SelectedRows.Count == 0) // 데이터를 선택 하지 않고 삭제를 누른 경우
-    {
-        MessageBox.Show("삭제할 데이터를 선택해주세요.");
-        return false;
-    }
+ private void patientdelete_Click(object sender, EventArgs e)
+ {
+     if (patient_list.SelectedRows.Count > 0) // 데이터가 선택 됬는데,
+     {
+         List<int> selectedPatientId = new List<int>();
+         if (patient_list.SelectedRows.Count == 1) // 1개의 데이터인 경우
+         {
+             var result = MessageBox.Show("해당 환자 정보가 삭제됩니다.\n계속하시겠습니까?", "환자 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+             if (result == DialogResult.No) { return; }
+             selectedPatientId.Add(Convert.ToInt32(patient_list.SelectedRows[0].Cells["환자번호"].Value));
+         }
+         else    // 여러개의 데이터인 경우
+         {
+             var result = MessageBox.Show($"{patient_list.SelectedRows.Count}명의 환자 정보가 삭제됩니다.\n계속하시겠습니까?", "환자 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+             if (result == DialogResult.No) { return; }
 
-    List<int> selectedId = new List<int>();     // 여러개의 데이터를 선택한경우 다중 삭제를 위해 리스트에 아이디들을 담기위해 변수 사용
-    foreach (DataGridViewRow row in dataGridView.SelectedRows)  
-    {
-        selectedId.Add(Convert.ToInt32(row.Cells[tableNameKor].Value)); // 선택된 행들의 id를 리스트에 추가
-    }
-    string table;
-    if     (tableName == "patient")       { table = "환자"; }
-    else if(tableName == "appointment")   { table = "예약"; }
-    else if(tableName == "v_hospital_v1") { table = "병원"; }
-    else { table = ""; }
-    var result = MessageBox.Show($"{selectedId.Count}개의 {table} 정보를 삭제합니다.\n계속하시겠습니까?",
-                                 $"{table} 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-    if (result == DialogResult.No)
-    {
-        return false;
-    }
+             for (int i = 0; i < patient_list.SelectedRows.Count; i++)
+             {
+                 selectedPatientId.Add(Convert.ToInt32(patient_list.SelectedRows[i].Cells["환자번호"].Value)); // 리스트에 모두 추가
+             }
+         }
 
-    conn.Open();
-    try
-    {
-        foreach (int id in selectedId)  // 리스트에 저장된 id에 해당하는 데이터 삭제
-        {
-            string query = $"DELETE FROM {tableName} WHERE {idStyle} = @id";
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@id", id);
-            cmd.ExecuteNonQuery();
-        }
-        MessageBox.Show($"{table} 정보가 삭제되었습니다.");
-        conn.Close();
-        return true;    // 정상적으로 삭제 한 경우에만 true 반환 후 메서드 종료
-
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show("오류: " + ex.Message);
-        conn.Close();
-    }
-    return false;
-}
+         try
+         {
+             conn.Open();
+             for (int i = 0; i < selectedPatientId.Count; i++) // 삭제
+             {
+                 string query = "DELETE FROM patient WHERE p_id = @p_id";
+                 MySqlCommand cmd = new MySqlCommand(query, conn);
+                 cmd.Parameters.AddWithValue("@p_id", selectedPatientId[i]);
+                 cmd.ExecuteNonQuery();
+             }
+             MessageBox.Show("환자 정보가 삭제되었습니다.");
+             conn.Close();
+             LoadPatientInfo();
+         }
+         catch (Exception ex)
+         {
+             MessageBox.Show("오류: " + ex.Message);
+         }
+         finally
+         {
+             conn.Close();
+         }
+     }
+     else
+     {
+         MessageBox.Show("삭제할 데이터를 선택해주세요.");
+     }
+ }
 ```
 
 - 데이터를 선택한 후 삭제 버튼을 누르면 경고 창이 띄워지며, 확인을 누르면 해당 데이터들이 삭제되고 목록이 갱신됩니다.
@@ -902,6 +900,7 @@ private async Task all_data_Load()    // 데이터 리스트를 비우고, 새�
     appointment_list.Columns.Clear();
     hospital_list.Columns.Clear();
     user_list.Columns.Clear();
+
     progressform = new ProgressForm();
     progressform.Show();
     await LoadDataAsync();
