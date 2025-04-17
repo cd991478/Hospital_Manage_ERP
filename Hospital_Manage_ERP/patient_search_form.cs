@@ -12,8 +12,8 @@ namespace Hospital_Manage_ERP
 {
     public partial class patient_search_form : Form
     {
-        public static string SearchFirst { get; set; }
-        public static string SearchSecond { get; set; }
+        public static string SearchFirst { get; set; }  // 첫번째 텍스트 박스 입력값
+        public static string SearchSecond { get; set; } // 두번째 텍스트 박스 입력값
 
         public patient_search_form()
         {
@@ -31,11 +31,6 @@ namespace Hospital_Manage_ERP
         {
             DialogResult = DialogResult.Cancel;
             this.Close();
-        }
-
-        private void patient_search_form_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

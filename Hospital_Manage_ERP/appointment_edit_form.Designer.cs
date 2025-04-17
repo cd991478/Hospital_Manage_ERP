@@ -206,6 +206,7 @@
             // 
             // appointment_cancel_button
             // 
+            this.appointment_cancel_button.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.appointment_cancel_button.Location = new System.Drawing.Point(169, 141);
             this.appointment_cancel_button.Name = "appointment_cancel_button";
             this.appointment_cancel_button.Size = new System.Drawing.Size(102, 35);
@@ -581,9 +582,11 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "appointment_edit_form";
+            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "예약 정보 수정";
             this.TopMost = true;
+            this.Load += new System.EventHandler(this.appointment_edit_form_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

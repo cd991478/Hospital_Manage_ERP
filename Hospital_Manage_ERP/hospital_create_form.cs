@@ -23,7 +23,6 @@ namespace Hospital_Manage_ERP
         {
             InitializeComponent();
             conn = new MySqlConnection($"Server={server};Database={db};Uid={id};Pwd={pw}");
-            this.Load += new EventHandler(hospital_create_form_Load);
             this.server = server;
             this.db = db;
             this.id = id;
@@ -35,18 +34,21 @@ namespace Hospital_Manage_ERP
             LoadHospitalNumber();
         }
 
-        private void LoadHospitalNumber()
+        private void LoadHospitalNumber()   // h_id (primary key) 값 설정을 위한 메서드
         {
             try
             {
                 conn.Open();
-                string query = "SELECT MAX(h_id) FROM d_hospital_v1";
+                string query = "SELECT MAX(h_id) FROM d_hospital_v1"; // 가장 마지막 (높은) pk값을 불러옴
                 MySqlCommand cmd = new MySqlCommand(query, conn);
-
                 MySqlDataReader reader = cmd.ExecuteReader();
-                if (reader.Read())
+                if (reader.Read() && reader[0] != DBNull.Value) // DB가 있을경우
                 {
-                    h_id_value.Text = (Convert.ToInt32(reader[0])+1).ToString();
+                    h_id_value.Text = (Convert.ToInt32(reader[0]) + 1).ToString();  // 불러온 가장 마지막 pk값에 1을 더하여 pk값 지정
+                }
+                else    // DB가 비어있을경우
+                {
+                    h_id_value.Text = "1"; // 첫번째 데이터 이므로 1로 지정
                 }
                 reader.Close();
             }
@@ -70,10 +72,8 @@ namespace Hospital_Manage_ERP
                                    "@h_phone_number, @bed_total, @bed_general, @bed_nursing, @bed_intensive, @bed_isolation, @bed_psy, @bed_clean, " +
                                    "@h_latitude, @h_longitude)";
                 MySqlCommand cmd = new MySqlCommand(query, conn);
-
-                // 사용자 입력값을 파라미터로 추가
-                cmd.Parameters.AddWithValue("@h_id", h_id_value.Text);
-                cmd.Parameters.AddWithValue("@h_name", h_name_value.Text);
+                cmd.Parameters.AddWithValue("@h_id", h_id_value.Text);  // 상단에서 지정된 pk 값으로 설정하며 이는 사용자가 임의로 수정할 수 없음
+                cmd.Parameters.AddWithValue("@h_name", h_name_value.Text);  // 각종 병원 정보 삽입
                 cmd.Parameters.AddWithValue("@h_region", h_region_value.Text);
                 cmd.Parameters.AddWithValue("@h_address", h_address_value.Text);
                 cmd.Parameters.AddWithValue("@h_department", h_department_value.Text);
@@ -86,13 +86,11 @@ namespace Hospital_Manage_ERP
                 cmd.Parameters.AddWithValue("@bed_isolation", Convert.ToInt32(bed_isolation_value.Text));
                 cmd.Parameters.AddWithValue("@bed_psy", Convert.ToInt32(bed_psy_value.Text));
                 cmd.Parameters.AddWithValue("@bed_clean", Convert.ToInt32(bed_clean_value.Text));
-                cmd.Parameters.AddWithValue("@h_latitude", 36.12345678); // 예시 값
-                cmd.Parameters.AddWithValue("@h_longitude", 128.12345678); // 예시 값
+                cmd.Parameters.AddWithValue("@h_latitude", 36.12345678);    // 위도 경도는 별도의 주소 변환 과정이 필요해 예시 값으로 설정
+                cmd.Parameters.AddWithValue("@h_longitude", 128.12345678);
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("병원 정보가 추가되었습니다.");
-                this.DialogResult = DialogResult.OK; // OK로 설정하여 병원 생성이 완료되었음을 알림
-                
-               
+                this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             catch (Exception ex)

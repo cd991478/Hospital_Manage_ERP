@@ -134,7 +134,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "환자 정보 검색";
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.patient_search_form_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

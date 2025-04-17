@@ -29,8 +29,6 @@ namespace Hospital_Manage_ERP
             this.id = id;
             this.pw = pw;
             conn = new MySqlConnection($"Server={server};Database={database};Uid={id};Pwd={pw}");
-            this.Load += new EventHandler(hospital_edit_form_Load);
-            
         }
 
         private void hospital_edit_form_Load(object sender, EventArgs e)
@@ -53,7 +51,7 @@ namespace Hospital_Manage_ERP
 
                 if (reader.Read())
                 {
-                    h_id_value.Text = reader["h_id"].ToString();
+                    h_id_value.Text = reader["h_id"].ToString();    // primary key 이므로 수정 불가능하게 디자이너에서 disabled로 설정
                     h_name_value.Text = reader["h_name"].ToString();
                     h_region_value.Text = reader["h_region"].ToString();
                     h_address_value.Text = reader["h_address"].ToString();
@@ -89,9 +87,8 @@ namespace Hospital_Manage_ERP
                 string query = "UPDATE d_hospital_v1 SET h_name = @h_name, h_region = @h_region, h_address = @h_address, h_phone_number = @h_phone_number, h_department = @h_department, h_categorie = @h_categorie, " +
                     "bed_total = @bed_total, bed_general = @bed_general, bed_psy = @bed_psy, bed_nursing = @bed_nursing, bed_intensive = @bed_intensive, " +
                     "bed_isolation = @bed_isolation, bed_clean = @bed_clean WHERE h_id = @h_id";
-                MySqlCommand cmd = new MySqlCommand(query, conn);
 
-                // 사용자 입력값을 파라미터로 추가
+                MySqlCommand cmd = new MySqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@h_id", Convert.ToInt32(h_id_value.Text));
                 cmd.Parameters.AddWithValue("@h_name", h_name_value.Text);
                 cmd.Parameters.AddWithValue("@h_region", h_region_value.Text);
@@ -106,10 +103,10 @@ namespace Hospital_Manage_ERP
                 cmd.Parameters.AddWithValue("@bed_isolation", Convert.ToInt32(bed_isolation_value.Text));
                 cmd.Parameters.AddWithValue("@bed_psy", Convert.ToInt32(bed_psy_value.Text));
                 cmd.Parameters.AddWithValue("@bed_clean", Convert.ToInt32(bed_clean_value.Text));
-
                 cmd.ExecuteNonQuery();
+
                 MessageBox.Show("병원 정보가 수정되었습니다.");
-                this.DialogResult = DialogResult.OK; // OK로 설정하여 병원 생성이 완료되었음을 알림
+                this.DialogResult = DialogResult.OK;
                 this.Close();
             }
             catch (Exception ex)

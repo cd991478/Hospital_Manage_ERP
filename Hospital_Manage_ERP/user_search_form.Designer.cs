@@ -114,7 +114,6 @@
             this.groupBox1.TabIndex = 23;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "조회할 정보 입력";
-            this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
             // user_search_form
             // 
@@ -135,7 +134,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "회원 정보 검색";
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.user_search_form_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

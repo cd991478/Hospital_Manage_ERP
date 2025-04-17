@@ -701,6 +701,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "환자 정보 수정";
             this.TopMost = true;
+            this.Load += new System.EventHandler(this.patient_edit_form_Load);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

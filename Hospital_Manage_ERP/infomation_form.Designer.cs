@@ -92,9 +92,9 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(54, 131);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(133, 12);
+            this.label4.Size = new System.Drawing.Size(89, 12);
             this.label4.TabIndex = 5;
-            this.label4.Text = "제작자 : 백성진  김중섭";
+            this.label4.Text = "제작자 : 백성진";
             // 
             // label5
             // 

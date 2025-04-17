@@ -375,9 +375,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(1183, 854);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(129, 12);
+            this.label2.Size = new System.Drawing.Size(89, 12);
             this.label2.TabIndex = 3;
-            this.label2.Text = "제작자 : 백성진 김중섭";
+            this.label2.Text = "제작자 : 백성진";
             // 
             // label3
             // 

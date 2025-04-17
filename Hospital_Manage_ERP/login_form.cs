@@ -18,13 +18,11 @@ namespace Hospital_Manage_ERP
         private string id;
         private string pw;
         private string connectionString;
-
         private MySqlConnection conn;
 
         public login_form()
         {
             InitializeComponent();
-            
         }
         private void login_form_Load(object sender, EventArgs e)
         {
@@ -36,40 +34,55 @@ namespace Hospital_Manage_ERP
             database = login_db_value.Text;
             id = login_id_value.Text;
             pw = login_pw_value.Text;
-            bool tf = false;
-            connectionString = $"Server={server};Database={database};Uid={id};Pwd={pw};";
-            conn = new MySqlConnection(connectionString);
-            try
+            bool tf = false;    // 로그인 결과를 저장할 변수
+            
+            if (unlogin_box.Checked)    // 강제 실행 체크된경우
             {
-                conn.Open();
-                MessageBox.Show("접속에 성공 하였습니다.");
+                server = "unlogined";
+                database = "unlogined";
+                id = "unlogined";
+                pw = "";
                 tf = true;
-
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show("접속에 실패 하였습니다.\n" + ex.Message);
-                
-            }
-            finally
-            {
-                conn.Close();
-            }
+                connectionString = $"Server={server};Database={database};Uid={id};Pwd={pw};";
+                conn = new MySqlConnection(connectionString);
+                try
+                {
+                    conn.Open();
+                    MessageBox.Show("접속에 성공 하였습니다.");
+                    tf = true;
 
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("접속에 실패 하였습니다.\n" + ex.Message);
 
-            if (tf == true)
+                }
+                finally
+                {
+                    conn.Close();
+                }
+            }
+            
+            if (tf == true)     // 로그인 성공시 혹은 강제 실행 한 경우
             {
-                main_form main_form = new main_form(server, database, id, pw);
-                this.Hide();
+                main_form main_form = new main_form(this, server, database, id, pw);
+                this.Hide();    // 닫으면 프로그램이 종료되므로 숨겨야함
                 main_form.Show();
-                main_form.FormClosed += (s, args) => this.Close();
             }
-            
-            
         }
         private void login_cancel_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+        private void unlogin_Checked(object sender, EventArgs e)
+        {
+            if (unlogin_box.Checked == true)
+            {
+                MessageBox.Show("로그인 버튼을 누르면 입력된 로그인 정보를 무시하고 강제 실행합니다.\n실행 후 데이터를 불러오려면 환경설정에서 DB에 연결해주세요.", "주의", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
     }
 }

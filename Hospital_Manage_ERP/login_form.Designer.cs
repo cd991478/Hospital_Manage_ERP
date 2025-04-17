@@ -43,6 +43,7 @@
             this.login_button = new System.Windows.Forms.Button();
             this.login_cancel = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.unlogin_box = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -181,6 +182,17 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "MySQL 데이터베이스 연결";
             // 
+            // unlogin_box
+            // 
+            this.unlogin_box.AutoSize = true;
+            this.unlogin_box.Location = new System.Drawing.Point(239, 269);
+            this.unlogin_box.Name = "unlogin_box";
+            this.unlogin_box.Size = new System.Drawing.Size(76, 16);
+            this.unlogin_box.TabIndex = 14;
+            this.unlogin_box.Text = "강제 실행";
+            this.unlogin_box.UseVisualStyleBackColor = true;
+            this.unlogin_box.CheckedChanged += new System.EventHandler(this.unlogin_Checked);
+            // 
             // login_form
             // 
             this.AcceptButton = this.login_button;
@@ -188,6 +200,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.login_cancel;
             this.ClientSize = new System.Drawing.Size(327, 286);
+            this.Controls.Add(this.unlogin_box);
             this.Controls.Add(this.login_cancel);
             this.Controls.Add(this.login_button);
             this.Controls.Add(this.label2);
@@ -227,5 +240,6 @@
         private System.Windows.Forms.Button login_button;
         private System.Windows.Forms.Button login_cancel;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.CheckBox unlogin_box;
     }
 }

@@ -32,15 +32,5 @@ namespace Hospital_Manage_ERP
             DialogResult = DialogResult.Cancel;
             this.Close();
         }
-
-        private void user_search_form_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-
-        }
     }
 }

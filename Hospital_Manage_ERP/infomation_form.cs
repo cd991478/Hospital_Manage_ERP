@@ -19,7 +19,7 @@ namespace Hospital_Manage_ERP
 
         public void close_button_Click(object sender, EventArgs e)
         {
-            Close();
+            this.Close();
         }
     }
 }
