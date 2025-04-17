@@ -410,13 +410,14 @@ public partial class patient_edit_form : Form
 #### 5. 환자 정보 데이터 삭제 기능
 ![5](./images/5.png)
 ```c#
+
 private void patientdelete_Click(object sender, EventArgs e)
 {
-    bool result = DeleteData(patient_list, "환자번호", "patient", "p_id"); // DataGridView, 한글명, 테이블명, id명
+    bool result = DeleteData(patient_list, "환자번호", "patient", "p_id"); // DataGridView, DataGridView의 id 표기칼럼명, 테이블 이름, primary key명
     if (result == true) { LoadPatientInfo(); }  // 정상 삭제한 경우 데이터 갱신
 }
 
- private bool DeleteData(DataGridView dataGridView, string tableNameKor, string tableName, string idStyle)
+private bool DeleteData(DataGridView dataGridView, string idColumnName, string tableName, string primaryKeyName)
 {
     if (dataGridView.SelectedRows.Count == 0) // 데이터를 선택 하지 않고 삭제를 누른 경우
     {
@@ -427,13 +428,13 @@ private void patientdelete_Click(object sender, EventArgs e)
     List<int> selectedId = new List<int>();
     foreach (DataGridViewRow row in dataGridView.SelectedRows)
     {
-        selectedId.Add(Convert.ToInt32(row.Cells[tableNameKor].Value)); // 선택된 행들의 id를 리스트에 추가
+        selectedId.Add(Convert.ToInt32(row.Cells[idColumnName].Value)); // 선택된 행들의 id를 리스트에 추가
     }
-    string table;
-    if (tableName == "patient") { table = "환자"; }
-    else if (tableName == "appointment") { table = "예약"; }
+    string table = "";
+    if      (tableName == "patient")     { table = "환자"; }
+    else if (tableName == "appointment")  { table = "예약"; }
     else if (tableName == "v_hospital_v1") { table = "병원"; }
-    else { table = ""; }
+
     var result = MessageBox.Show($"{selectedId.Count}개의 {table} 정보를 삭제합니다.\n계속하시겠습니까?",
                                  $"{table} 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
     if (result == DialogResult.No)
@@ -446,14 +447,14 @@ private void patientdelete_Click(object sender, EventArgs e)
     {
         foreach (int id in selectedId)  // 리스트에 저장된 id에 해당하는 데이터 삭제
         {
-            string query = $"DELETE FROM {tableName} WHERE {idStyle} = @id";
+            string query = $"DELETE FROM {tableName} WHERE {primaryKeyName} = @id";
             MySqlCommand cmd = new MySqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@id", id);
             cmd.ExecuteNonQuery();
         }
         MessageBox.Show($"{table} 정보가 삭제되었습니다.");
         conn.Close();
-        return true;    // 정상적으로 삭제 한 경우에만 true 반환 후 메서드 종료
+        return true;    // 정상 삭제
 
     }
     catch (Exception ex)
@@ -463,6 +464,8 @@ private void patientdelete_Click(object sender, EventArgs e)
     }
     return false;
 }
+
+
 
 
 ```
