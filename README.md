@@ -424,7 +424,7 @@ private void patientdelete_Click(object sender, EventArgs e)
         return false;
     }
 
-    List<int> selectedId = new List<int>();     // 여러개의 데이터를 선택한경우 다중 삭제를 위한 리스트
+    List<int> selectedId = new List<int>();
     foreach (DataGridViewRow row in dataGridView.SelectedRows)
     {
         selectedId.Add(Convert.ToInt32(row.Cells[tableNameKor].Value)); // 선택된 행들의 id를 리스트에 추가
