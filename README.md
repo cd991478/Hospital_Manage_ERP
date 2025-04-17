@@ -116,52 +116,44 @@ private async Task LoadDataAsync()
     });
 }
 
-// 환자 정보 로드
 private void LoadPatientInfo()
-{
-    string query = "SELECT p_id AS '환자번호', " +
-        "p_user_id AS '등록 아이디', " +
-        "p_name AS '이름', " +
-        "CASE WHEN p_gender = 0 THEN '남자' WHEN p_gender = 1 THEN '여자' ELSE '알 수 없음' END AS '성별', " +
-        "p_reg_num AS '주민번호 앞 6자리', " +
-        "p_age AS '나이', " +
-        "p_phone AS '전화번호', " +
-        "p_address1 AS '주소', " +
-        "p_address2 AS '주소상세', " +
-        "p_insert_date_time AS '등록일시', " +
-        "CASE WHEN p_taking_pill = 0 THEN '무' WHEN p_taking_pill = 1 THEN '유' ELSE '알 수 없음' END AS '약 복용 유무', " +
-        "CASE WHEN p_nose = 0 THEN '무' WHEN p_nose = 1 THEN '유' ELSE '알 수 없음' END AS '콧물 혹은 코막힘', " +
-        "CASE WHEN p_cough = 0 THEN '무' WHEN p_cough = 1 THEN '유' ELSE '알 수 없음' END AS '기침 또는 거래', " +
-        "CASE WHEN p_pain = 0 THEN '무' WHEN p_pain = 1 THEN '유' ELSE '알 수 없음' END AS '통증', " +
-        "CASE WHEN p_diarrhea = 0 THEN '무' WHEN p_diarrhea = 1 THEN '유' ELSE '알 수 없음' END AS '설사', " +
-        "CASE WHEN p_covid19 = 0 THEN '무' WHEN p_covid19 = 1 THEN '유' WHEN p_covid19 = 2 THEN '모름' ELSE '알 수 없음' END AS 'Covid-19 감염 유무', " +
-        "CASE WHEN p_high_risk_group = 0 THEN '59개월 이하의 소아' " +
-        "WHEN p_high_risk_group = 1 THEN '임산부' " +
-        "WHEN p_high_risk_group = 2 THEN '만성 폐질환' " +
-        "WHEN p_high_risk_group = 3 THEN '당뇨' " +
-        "WHEN p_high_risk_group = 4 THEN '암환자' " +
-        "WHEN p_high_risk_group = 5 THEN '해당없음' " +
-        "ELSE '알 수 없음' END AS '고위험군 분류', " +
-        "p_vas AS '시각통증수치 (VAS)' " +
-        "FROM patient";
-
-    LoadData(query, patient_list, (dataTable) =>
-    {
-        patient_list.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
-        patient_list.Columns["주소"].Width = 400;
-    });
-}
-// 여러 데이터 로드 함수의 재사용되는 코드를 줄이고자 다음과 같이 개선
-private void LoadData(string query, DataGridView dataGrid, Action<DataTable> customizeColumns = null)
 {
     try
     {
         conn.Open();
+        string query = "SELECT p_id AS '환자번호', " +
+            "p_user_id AS '등록 아이디', " +
+            "p_name AS '이름', " +
+            "CASE WHEN p_gender = 0 THEN '남자' WHEN p_gender = 1 THEN '여자' ELSE '알 수 없음' END AS '성별', " +
+            "p_reg_num AS '주민번호 앞 6자리', " +
+            "p_age AS '나이', " +
+            "p_phone AS '전화번호', " +
+            "p_address1 AS '주소', " +
+            "p_address2 AS '주소상세', " +
+            "p_insert_date_time AS '등록일시', " +
+            "CASE WHEN p_taking_pill = 0 THEN '무' WHEN p_taking_pill = 1 THEN '유' ELSE '알 수 없음' END AS '약 복용 유무', " +
+            "CASE WHEN p_nose = 0 THEN '무' WHEN p_nose = 1 THEN '유' ELSE '알 수 없음' END AS '콧물 혹은 코막힘', " +
+            "CASE WHEN p_cough = 0 THEN '무' WHEN p_cough = 1 THEN '유' ELSE '알 수 없음' END AS '기침 또는 거래', " +
+            "CASE WHEN p_pain = 0 THEN '무' WHEN p_pain = 1 THEN '유' ELSE '알 수 없음' END AS '통증', " +
+            "CASE WHEN p_diarrhea = 0 THEN '무' WHEN p_diarrhea = 1 THEN '유' ELSE '알 수 없음' END AS '설사', " +
+            "CASE WHEN p_covid19 = 0 THEN '무' WHEN p_covid19 = 1 THEN '유' WHEN p_covid19 = 2 THEN '모름' ELSE '알 수 없음' END AS 'Covid-19 감염 유무', " +
+            "CASE WHEN p_high_risk_group = 0 THEN '59개월 이하의 소아' " +
+            "WHEN p_high_risk_group = 1 THEN '임산부' " +
+            "WHEN p_high_risk_group = 2 THEN '만성 폐질환' " +
+            "WHEN p_high_risk_group = 3 THEN '당뇨' " +
+            "WHEN p_high_risk_group = 4 THEN '암환자' " +
+            "WHEN p_high_risk_group = 5 THEN '해당없음' " +
+            "ELSE '알 수 없음' END AS '고위험군 분류', " +
+            "p_vas AS '시각통증수치 (VAS)' " +
+            "FROM patient"; // 출력할 데이터를 가져올 쿼리문
+
         MySqlDataAdapter adapter = new MySqlDataAdapter(query, conn);
         DataTable dataTable = new DataTable();
         adapter.Fill(dataTable);
-        dataGrid.Invoke(new Action(() => { dataGrid.DataSource = dataTable; }));
-        customizeColumns?.Invoke(dataTable);  // 컬럼 길이 조정
+        patient_list.Invoke(new Action(() => { patient_list.DataSource = dataTable; }));
+
+        patient_list.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+        patient_list.Columns["주소"].Width = 400;
     }
     catch (Exception ex)
     {
@@ -418,56 +410,61 @@ public partial class patient_edit_form : Form
 #### 5. 환자 정보 데이터 삭제 기능
 ![5](./images/5.png)
 ```c#
- private void patientdelete_Click(object sender, EventArgs e)
- {
-     if (patient_list.SelectedRows.Count > 0) // 데이터가 선택 됬는데,
-     {
-         List<int> selectedPatientId = new List<int>();
-         if (patient_list.SelectedRows.Count == 1) // 1개의 데이터인 경우
-         {
-             var result = MessageBox.Show("해당 환자 정보가 삭제됩니다.\n계속하시겠습니까?", "환자 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-             if (result == DialogResult.No) { return; }
-             selectedPatientId.Add(Convert.ToInt32(patient_list.SelectedRows[0].Cells["환자번호"].Value));
-         }
-         else    // 여러개의 데이터인 경우
-         {
-             var result = MessageBox.Show($"{patient_list.SelectedRows.Count}명의 환자 정보가 삭제됩니다.\n계속하시겠습니까?", "환자 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-             if (result == DialogResult.No) { return; }
+private void patientdelete_Click(object sender, EventArgs e)
+{
+    bool result = DeleteData(patient_list, "환자번호", "patient", "p_id"); // DataGridView, 한글명, 테이블명, id명
+    if (result == true) { LoadPatientInfo(); }  // 정상 삭제한 경우 데이터 갱신
+}
 
-             for (int i = 0; i < patient_list.SelectedRows.Count; i++)
-             {
-                 selectedPatientId.Add(Convert.ToInt32(patient_list.SelectedRows[i].Cells["환자번호"].Value)); // 리스트에 모두 추가
-             }
-         }
+ private bool DeleteData(DataGridView dataGridView, string tableNameKor, string tableName, string idStyle)
+{
+    if (dataGridView.SelectedRows.Count == 0) // 데이터를 선택 하지 않고 삭제를 누른 경우
+    {
+        MessageBox.Show("삭제할 데이터를 선택해주세요.");
+        return false;
+    }
 
-         try
-         {
-             conn.Open();
-             for (int i = 0; i < selectedPatientId.Count; i++) // 삭제
-             {
-                 string query = "DELETE FROM patient WHERE p_id = @p_id";
-                 MySqlCommand cmd = new MySqlCommand(query, conn);
-                 cmd.Parameters.AddWithValue("@p_id", selectedPatientId[i]);
-                 cmd.ExecuteNonQuery();
-             }
-             MessageBox.Show("환자 정보가 삭제되었습니다.");
-             conn.Close();
-             LoadPatientInfo();
-         }
-         catch (Exception ex)
-         {
-             MessageBox.Show("오류: " + ex.Message);
-         }
-         finally
-         {
-             conn.Close();
-         }
-     }
-     else
-     {
-         MessageBox.Show("삭제할 데이터를 선택해주세요.");
-     }
- }
+    List<int> selectedId = new List<int>();     // 여러개의 데이터를 선택한경우 다중 삭제를 위해 리스트에 아이디들을 담기위해 변수 사용
+    foreach (DataGridViewRow row in dataGridView.SelectedRows)
+    {
+        selectedId.Add(Convert.ToInt32(row.Cells[tableNameKor].Value)); // 선택된 행들의 id를 리스트에 추가
+    }
+    string table;
+    if (tableName == "patient") { table = "환자"; }
+    else if (tableName == "appointment") { table = "예약"; }
+    else if (tableName == "v_hospital_v1") { table = "병원"; }
+    else { table = ""; }
+    var result = MessageBox.Show($"{selectedId.Count}개의 {table} 정보를 삭제합니다.\n계속하시겠습니까?",
+                                 $"{table} 삭제 확인", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+    if (result == DialogResult.No)
+    {
+        return false;
+    }
+
+    conn.Open();
+    try
+    {
+        foreach (int id in selectedId)  // 리스트에 저장된 id에 해당하는 데이터 삭제
+        {
+            string query = $"DELETE FROM {tableName} WHERE {idStyle} = @id";
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@id", id);
+            cmd.ExecuteNonQuery();
+        }
+        MessageBox.Show($"{table} 정보가 삭제되었습니다.");
+        conn.Close();
+        return true;    // 정상적으로 삭제 한 경우에만 true 반환 후 메서드 종료
+
+    }
+    catch (Exception ex)
+    {
+        MessageBox.Show("오류: " + ex.Message);
+        conn.Close();
+    }
+    return false;
+}
+
+
 ```
 
 - 데이터를 선택한 후 삭제 버튼을 누르면 경고 창이 띄워지며, 확인을 누르면 해당 데이터들이 삭제되고 목록이 갱신됩니다.
