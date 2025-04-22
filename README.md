@@ -11,7 +11,13 @@
 
 ### - 구동 과정
 #### 1. 프로그램 시작, DB 접속
+
 ![1](./images/1.png)
+
+- 프로그램 실행시 먼저 로그인 폼이 실행되며, MySQL DB 로그인 정보를 입력하여 DB 서버 접속 및 프로그램 실행이 가능합니다.
+- 강제 실행을 체크하고 로그인 버튼을 누르면 DB 연결 없이 메인 화면으로 진입 할 수 있습니다.
+
+
 ```c#
 public partial class login_form : Form
 {
@@ -75,12 +81,15 @@ public partial class login_form : Form
 }
 ```
 
-- 프로그램 실행시 먼저 로그인 폼이 실행되며, MySQL DB 로그인 정보를 입력하여 DB 서버 접속 및 프로그램 실행이 가능합니다.
-- 강제 실행을 체크하고 로그인 버튼을 누르면 DB 연결 없이 메인 화면으로 진입 할 수 있습니다.
+---
 
 #### 2. 데이터 로드
 ![2](./images/2.png)
 ![3](./images/3.png)
+
+- DB에 접속 성공시 메인폼이 실행되며 전체 DB를 불러옵니다.
+- 강제 실행을 할 경우 메인폼은 실행되지만 로그인 정보가 없기 때문에 DB는 불러오지 않습니다.
+
 ```c#
 public main_form(Form login_form, string login_server, string login_database, string login_id, string login_pw)
 {
@@ -165,11 +174,16 @@ private void LoadPatientInfo()
     }
 }
 ```
-- DB에 접속 성공시 메인폼이 실행되며 전체 DB를 불러옵니다.
-- 강제 실행을 할 경우 메인폼은 실행되지만 로그인 정보가 없기 때문에 DB는 불러오지 않습니다.
+
+---
 
 #### 3. 환자 정보 데이터 수정 기능
+
 ![4](./images/4.png)
+
+- 환자 데이터를 선택하고 수정 버튼을 누르면 새 창에서 해당 환자의 데이터를 불러오며, 환자 primary key인 id와 등록 회원 id를 제외한 데이터 수정이 가능합니다.
+- 수정 버튼을 누르면 DB의 데이터가 수정되고 창이 닫히며, 메인으로 돌아와 목록을 갱신합니다.
+
 ```c#
 private void patientedit_Click(object sender, EventArgs e)    // 메인 폼에서 환자 정보 수정 버튼을 누르면 실행
 {
@@ -403,12 +417,14 @@ public partial class patient_edit_form : Form
 }
 ```
 
-- 데이터를 선택하고 수정 버튼을 누르면 새 창에서 해당 환자의 데이터를 불러오며, 환자 primary key인 id와 등록 회원 id를 제외한 데이터 수정이 가능합니다.
-- 수정 버튼을 누르면 DB의 데이터가 수정되고 창이 닫히며, 메인으로 돌아와 목록을 갱신합니다.
-
+---
 
 #### 5. 환자 정보 데이터 삭제 기능
+
 ![5](./images/5.png)
+
+- 데이터를 선택한 후 삭제 버튼을 누르면 경고 창이 띄워지며, 확인을 누르면 선택된 데이터들이 삭제되고 목록이 갱신됩니다.
+
 ```c#
 
 private void patientdelete_Click(object sender, EventArgs e)
@@ -470,11 +486,16 @@ private bool DeleteData(DataGridView dataGridView, string idColumnName, string t
 
 ```
 
-- 데이터를 선택한 후 삭제 버튼을 누르면 경고 창이 띄워지며, 확인을 누르면 해당 데이터들이 삭제되고 목록이 갱신됩니다.
+---
 
 #### 6. 환자 정보 데이터 검색 기능
+
 ![6](./images/8.png)
 ![6](./images/9.png)
+
+- 검색 버튼을 누르면 새 창이 열리며, 해당 탭의 데이터에서 찾기 원하는 정보를 입력 후 검색 버튼을 누르면 해당 문구가 포함된 모든 데이터가 출력됩니다.
+- 두 개의 TextBox중 하나의 값만 입력해도 검색이 가능합니다.
+  
 ```c#
 public partial class patient_search_form : Form
 {
@@ -568,11 +589,15 @@ private void patient_search_Click(object sender, EventArgs e)
 }
 ```
 
-- 검색 버튼을 누르면 새 창이 열리며, 데이터에서 찾기 원하는 문구를 입력 후 검색 버튼을 누르면 해당 문구가 포함된 모든 데이터가 출력됩니다.
-- 두 개의 TextBox중 하나의 값만 입력해도 작동합니다.
+---
 
 #### 7. 예약 정보 수정 (테이블 Join)
+
 ![10](./images/10.png)
+
+- 예약 데이터를 선택한 후 수정 버튼을 누르면 해당 예약과 연결된 환자 id와 병원 id의 데이터를 Join 하여 불러옵니다.
+- 예약자 이름과 예약 일시만 변경할 수 있으며, 값을 변경하고 수정 버튼을 누르면 DB의 정보가 변경됩니다.
+
 ```c#
 public partial class appointment_edit_form : Form
 {
@@ -701,12 +726,15 @@ public partial class appointment_edit_form : Form
 }
 ```
 
-- 예약 정보 목록을 선택 후 수정 버튼을 누르면 해당 예약과 연결된 환자 id와 병원 id의 데이터를 Join 하여 불러옵니다.
-- 예약 시간을 변경하고 수정 버튼을 누르면 예약 시간 정보가 변경됩니다.
-
+---
 
 #### 8. 병원 정보 등록
+
 ![12](./images/12.png)
+
+- 병원 정보 탭에서 병원 정보 등록을 누르면 새 창이 뜨며, 병원 정보를 기입한 후 버튼을 누르면 새로운 병원 정보가 DB에 저장됩니다.
+- 병원 정보 테이블의 primary key 인 h_id를 생성 하기 위해 가장 마지막 h_id값을 찾고 1을 더하여 새로운 병원 정보의 primary key를 자동으로 설정합니다.
+
 ```c#
 public partial class hospital_create_form : Form
 {
@@ -801,12 +829,15 @@ public partial class hospital_create_form : Form
     }
 ```
 
-- 병원 정보 탭에서 병원 정보 등록을 누르면 새 창이 뜨며, 병원 정보를 기입 후 버튼을 누르면 새로운 병원 정보가 DB에 저장됩니다.
-- 병원 정보 테이블의 primary key 인 h_id를 생성 하기 위해 가장 마지막 h_id값을 찾고 1을 더하여 새로운 병원 정보의 primary key를 설정합니다.
-
+---
 
 #### 9. 회원 정보 강제 삭제 (회원과 연결된 예약 포함)
+
 ![15](./images/15.png)
+
+- 회원 정보 탭에서 회원 데이터들을 선택한 후 삭제 버튼을 누르면 확인 경고 창이 뜨고, 확인 버튼을 누르면 선택된 회원과 연결된 예약 데이터를 모두 삭제하고, 회원 데이터를 삭제합니다.
+- 관리자 계정이 선택된 경우 알림을 띄우며 삭제를 중단합니다.
+
 ```c#
 private void user_delete_Click(object sender, EventArgs e)
 {
@@ -873,11 +904,15 @@ private void user_delete_Click(object sender, EventArgs e)
 }
 ```
 
-- 회원 정보 탭에서 회원을 선택하고 삭제 버튼을 누르면 확인 경고 창이 뜨고, 확인 버튼을 누르면 선택된 회원과 연결된 예약 데이터를 모두 삭제하고, 회원 데이터를 삭제합니다.
-- 관리자 계정이 선택된 경우 알림을 띄우며 작업을 중단합니다.
+---
 
 #### 10. DB 연결 설정 변경
+
 ![16](./images/16.png)
+
+- 환경 설정 버튼을 누르면 새 창이 띄워지며, 현재 접속중인 DB의 정보를 불러옵니다.
+- 다른 DB에 접속하길 원하는 경우, 값을 수정하여 적용 버튼을 누르면 해당 DB에 연결하여 새로운 데이터를 불러옵니다.
+
 ```c#
 
 private async void setting_Click(object sender, EventArgs e)
@@ -962,11 +997,14 @@ public partial class setting_form : Form
 
 ```
 
-- 환경 설정 버튼을 누르면 새 창이 띄워지며, 현재 접속중인 DB의 정보를 불러옵니다.
-- 다른 DB에 접속하길 원하는 경우, 값을 수정하여 적용 버튼을 누르면 해당 DB에 연결하여 새로운 데이터를 불러옵니다.
+---
 
 #### 11. 프로그램 종료
+
 ![17](./images/17.png)
+
+- 메인 화면에서 우측 상단 X 버튼을 누르면 확인창이 뜨며, 확인 버튼을 누르면 프로그램이 정상 종료 됩니다.
+
 ```c#
 private void main_form_FormClosing(object sender, FormClosingEventArgs e)
 {
@@ -985,5 +1023,5 @@ private void main_form_FormClosing(object sender, FormClosingEventArgs e)
 }
 ```
 
-- 메인 화면에서 우측 상단 X 버튼을 누르면 확인창이 뜨며, 확인 버튼을 누르면 프로그램이 정상 종료 됩니다.
+
 
