@@ -494,7 +494,7 @@ private bool DeleteData(DataGridView dataGridView, string idColumnName, string t
 ![6](./images/9.png)
 
 - 검색 버튼을 누르면 새 창이 열리며, 해당 탭의 데이터에서 찾기 원하는 정보를 입력 후 검색 버튼을 누르면 해당 문구가 포함된 모든 데이터가 출력됩니다.
-- 두 개의 TextBox중 하나의 값만 입력해도 검색이 가능합니다.
+- 두 개의 TextBox중 하나의 값만 입력해도 검색이 가능하며, 1~2글자를 입력하는 등 일부 글자나 숫자만 입력하여도 검색이 가능합니다.
   
 ```c#
 public partial class patient_search_form : Form
