@@ -777,14 +777,8 @@ public partial class hospital_create_form : Form
             }
             reader.Close();
         }
-        catch(Exception ex)
-        {
-            MessageBox.Show("오류: " + ex.Message);
-        }
-        finally
-        {
-            conn.Close();
-        }
+        catch(Exception ex) { MessageBox.Show("오류: " + ex.Message); }
+        finally { conn.Close(); }
     }
     private void hospital_create_button_Click(object sender, EventArgs e)
     {
@@ -818,14 +812,8 @@ public partial class hospital_create_form : Form
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show("오류: " + ex.Message);
-        }
-        finally
-        {
-            conn.Close();
-        }
+        catch (Exception ex) { MessageBox.Show("오류: " + ex.Message); }
+        finally { conn.Close(); }
     }
 ```
 
